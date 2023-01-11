@@ -18,12 +18,11 @@ createApp({
 			axios
 				.post(url)
 				.then(() => {
-					// console.log(res);
 					// 登入成功，取得資料。
 					this.getData();
 				})
-				.catch(() => {
-					alert("禁止使用, 請確認 api_path 是否為本人使用。");
+				.catch((err) => {
+					alert(err.response.data.message);
 					// 登入失敗，跳轉回 login.html 頁面
 					window.location = "login.html";
 				});
@@ -37,11 +36,9 @@ createApp({
 				.get(url)
 				.then((res) => {
 					// 先用 console.log 確認產品陣列在哪一層
-					// console.log(res);
 					this.products = res.data.products;
 				})
 				.catch((err) => {
-					console.dir(err);
 					alert(err.response.data.message);
 				});
 		},
@@ -57,7 +54,6 @@ createApp({
 		// 	axios
 		// 		.delete(url)
 		// 		.then((res) => {
-		// 			console.log(res);
 		// 		})
 		// 		.catch((err) => {
 		// 			console.dir(err);
@@ -70,7 +66,6 @@ createApp({
 			/(?:(?:^|.*;\s*)drmemeToken\s*\=\s*([^;]*).*$)|^.*$/,
 			"$1"
 		);
-		// console.log(token);
 		// https://github.com/axios/axios
 		axios.defaults.headers.common.Authorization = token;
 
