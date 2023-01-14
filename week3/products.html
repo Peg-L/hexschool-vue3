@@ -37,6 +37,7 @@
 						</tr>
 					</thead>
 					<tbody>
+						<!-- v-for 遍歷 products 中所有 product，v-for 加上 :key (唯一值) -->
 						<tr v-for="(product) in products" :key="product.id">
 							<td>{{ product.category }}</td>
 							<td>{{ product.title }}</td>
@@ -48,7 +49,7 @@
 							</td>
 							<td>
 								<div class="btn-group">
-									<!-- @click 觸發 openModal 事件( Modal互動視窗 )，傳入兩個參數'edit', product 來編輯 -->
+									<!-- @click 觸發 openModal 方法( Modal互動視窗 )，傳入兩個參數'edit', product 來編輯 -->
 									<button
 										type="button"
 										class="btn btn-outline-primary btn-sm"
@@ -56,7 +57,7 @@
 									>
 										編輯
 									</button>
-									<!-- @click 觸發 openModal 事件( Modal互動視窗 )，傳入兩個參數'delete', product 來刪除 -->
+									<!-- @click 觸發 openModal 方法( Modal互動視窗 )，傳入兩個參數'delete', product 來刪除 -->
 									<button
 										type="button"
 										class="btn btn-outline-danger btn-sm"
@@ -101,6 +102,7 @@
 								aria-label="Close"
 							></button>
 						</div>
+						<!-- v-model 同步內容 -->
 						<div class="modal-body">
 							<div class="row">
 								<div class="col-sm-4">
@@ -113,6 +115,7 @@
 											v-model="tempProduct.imageUrl"
 										/>
 									</div>
+									<!-- 使用 v-bind: 來動態改變圖片來源(:src)和替代文字(:alt) -->
 									<img
 										class="img-fluid"
 										:src="tempProduct.imageUrl"
@@ -140,8 +143,12 @@
 											</div>
 											<img class="img-fluid" :src="image" />
 										</div>
+										<!-- 避免無限新增空圖片：
+										imagesUrl 陣列無內容(長度為0) 
+										或是 
+										當前圖片網址已有輸入值，可新增下一個(當前圖片網址不可為空值、空白) -->
 										<div
-											v-if="!tempProduct.imagesUrl.length || tempProduct.imagesUrl[tempProduct.imagesUrl.length - 1]"
+											v-if="tempProduct.imagesUrl.length ==0 || tempProduct.imagesUrl[tempProduct.imagesUrl.length - 1].replace(' ', '')"
 										>
 											<button
 												class="btn btn-outline-primary btn-sm d-block w-100"
@@ -321,7 +328,7 @@
 							商品(刪除後將無法恢復)。
 						</div>
 						<div class="modal-footer">
-							<!-- data-bs-dismiss="modal" 加在"取消"按鈕上，點擊後才可觸發關閉 modal 視窗 -->
+							<!-- data-bs-dismiss="modal" 加在"取消"按鈕上，讓該按鈕在點擊後，接著關閉 modal 視窗。 -->
 							<button
 								type="button"
 								class="btn btn-outline-secondary"

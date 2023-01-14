@@ -1,4 +1,4 @@
-1. v-if 這段是什麼意思
+1. [已解決] v-if 這段是什麼意思
 
 ```javascript
 <div v-if="!tempProduct.imagesUrl.length || tempProduct.imagesUrl[tempProduct.imagesUrl.length - 1]">
@@ -8,5 +8,5 @@
 </div>
 ```
 
-2. true-value / false-value
+2. [已解決] true-value / false-value 是什麼用途？
    https://myiaj.github.io/2020/03/10/Vue-checkbox%E8%88%87true-false-value/

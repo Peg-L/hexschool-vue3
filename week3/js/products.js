@@ -1,4 +1,3 @@
-// 註記
 // vue 自動將所有資料方法展開至 proxy 中，this 即可取得 methods 中的 getData、data 中的 apiUrl、apiPath 等等
 import { createApp } from "https://unpkg.com/vue@3/dist/vue.esm-browser.js"; // import {} from 來源：具名匯入模組
 
@@ -10,7 +9,7 @@ createApp({
 	data() {
 		return {
 			apiUrl: "https://vue3-course-api.hexschool.io/v2",
-			apiPath: "drmeme",
+			apiPath: "drmeme", // 使用自己申請的 api
 			products: [],
 			isNew: false,
 			tempProduct: {
@@ -33,7 +32,7 @@ createApp({
 		productModal = new bootstrap.Modal(
 			document.getElementById("productModal"),
 			{
-				// keyboard: true, 按 esc 鍵關閉 Modal，反之不會關閉 https://bootstrap5.hexschool.com/docs/5.0/components/modal/#options
+				// keyboard: true, 按 esc 鍵可關閉 Modal，false 則不會關閉 https://bootstrap5.hexschool.com/docs/5.0/components/modal/#options
 				keyboard: false,
 			}
 		);
@@ -48,6 +47,7 @@ createApp({
 	},
 
 	// 方法
+	// 透過 .then() 取得成功 response，.catch() 取得失敗 response
 	methods: {
 		// 確認管理員登入
 		checkAdmin() {
@@ -55,15 +55,15 @@ createApp({
 			axios
 				.post(url)
 				.then(() => {
-					this.getData();
+					this.getData(); // 成功：觸發 getData() 來取得資料
 				})
 				.catch((err) => {
 					alert(err.response.data.message);
-					window.location = "login.html";
+					window.location = "login.html"; // 失敗後跳轉回登入頁面
 				});
 		},
 
-		// 取的 data
+		// 取得 data
 		getData() {
 			const url = `${this.apiUrl}/api/${this.apiPath}/admin/products/all`;
 			axios
@@ -72,7 +72,7 @@ createApp({
 					this.products = res.data.products;
 				})
 				.catch((err) => {
-					alert(err.response.data.message);
+					alert(err.response.data.message); // 失敗：都使用 "伺服器回傳的錯誤訊息"
 				});
 		},
 
@@ -80,18 +80,18 @@ createApp({
 		updateProduct() {
 			// 將 url 改為新增產品 api，方法為 post
 			let url = `${this.apiUrl}/api/${this.apiPath}/admin/product`;
-			let http = "post";
+			let httpMethod = "post";
 
 			// 將 url 改為編輯產品api，方法為 put
 			if (!this.isNew) {
 				url = `${this.apiUrl}/api/${this.apiPath}/admin/product/${this.tempProduct.id}`;
-				http = "put";
+				httpMethod = "put";
 			}
 
-			axios[http](url, { data: this.tempProduct })
+			axios[httpMethod](url, { data: this.tempProduct })
 				.then((res) => {
 					alert(res.data.message);
-					productModal.hide(); // alert 關閉，Modal 接著隱藏
+					productModal.hide(); // 前面 alert 關閉後，.hide()：Modal 隱藏
 					this.getData();
 				})
 				.catch((err) => {
@@ -99,14 +99,14 @@ createApp({
 				});
 		},
 
-		// 開啟互動視窗
+		// 開啟互動視窗(Modal)
 		openModal(isNew, item) {
 			if (isNew === "new") {
 				this.tempProduct = {
 					imagesUrl: [],
 				};
 				this.isNew = true;
-				productModal.show();
+				productModal.show(); // .show：Modal 打開
 			} else if (isNew === "edit") {
 				this.tempProduct = { ...item };
 				this.isNew = false;
