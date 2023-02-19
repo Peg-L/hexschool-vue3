@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>week5 refModal</title>
+		<!-- https://cdnjs.com/libraries/vue -->
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/vue/3.2.47/vue.global.min.js"></script>
+		<script
+			src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"
+			integrity="sha384-oBqDVmMz9ATKxIep9tiCxS/Z9fNfEXiDAYTujMAeBAsjFuCZSmKbSSUnQlmh/jp3"
+			crossorigin="anonymous"
+		></script>
+		<link
+			href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css"
+			rel="stylesheet"
+			integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD"
+			crossorigin="anonymous"
+		/>
+		<script
+			src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"
+			integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN"
+			crossorigin="anonymous"
+		></script>
+	</head>
+
+	<body>
+		<div id="app">
+			{{ text }}
+
+			<!-- Button trigger modal -->
+			<button type="button" class="btn btn-primary" @click="openModal">
+				Launch demo modal
+			</button>
+
+			<!-- Modal -->
+			<modal ref="modal"></modal>
+		</div>
+		<script>
+			const { createApp } = Vue;
+
+			// $ref 用途
+			// 取得元件資料或方法
+			// 作為 DOM 使用
+
+			const app = createApp({
+				data() {
+					return {
+						text: "這是一段文字",
+						arr: ["a", "b", "c"],
+					};
+				},
+				methods: {
+					openModal() {
+						this.$refs.modal.show();
+					},
+				},
+				mounted() {
+					console.log(this);
+
+					// Modal 方法建立在元件內層，釋出方法讓外層使用
+
+					// 移到 mounted 中，等 Vue 結構建好再運作
+					// Bootstrap 寫法
+					// 改成移到內層 mounted
+					// const myModal = new bootstrap.Modal("#exampleModal");
+					// myModal.show();
+				},
+			});
+
+			// Modal 要能釋出方法，讓外層能夠使用
+			app.component("Modal", {
+				data() {
+					return {
+						myModal: {},
+					};
+				},
+				methods: {
+					show() {
+						this.myModal.show();
+					},
+				},
+				template: `<div
+				class="modal fade"
+				ref="modal"
+				tabindex="-1"
+				aria-labelledby="exampleModalLabel"
+				aria-hidden="true"
+			>
+				<div class="modal-dialog">
+					<div class="modal-content">
+						<div class="modal-header">
+							<h1 class="modal-title fs-5" id="exampleModalLabel">
+								Modal title
+							</h1>
+							<button
+								type="button"
+								class="btn-close"
+								data-bs-dismiss="modal"
+								aria-label="Close"
+							></button>
+						</div>
+						<div class="modal-body">...</div>
+						<div class="modal-footer">
+							<button
+								type="button"
+								class="btn btn-secondary"
+								data-bs-dismiss="modal"
+							>
+								Close
+							</button>
+							<button type="button" class="btn btn-primary">
+								Save changes
+							</button>
+						</div>
+					</div>
+				</div>
+			</div>`,
+				mounted() {
+					this.myModal = new bootstrap.Modal(this.$refs.modal);
+					this.myModal.show();
+					// 作為 dom 元素使用
+					// console.log("modal", this.$refs.modal);
+				},
+			});
+			app.mount("#app");
+		</script>
+	</body>
+</html>

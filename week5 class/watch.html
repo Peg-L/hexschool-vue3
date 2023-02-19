@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>week5 watch</title>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/vue/3.2.47/vue.global.min.js"></script>
+	</head>
+	<body>
+		<div id="app" class="container mt-3">
+			<input type="number" v-model="outerNum" />
+			<card :num="outerNum"></card>
+		</div>
+
+		<script>
+			const app = Vue.createApp({
+				data() {
+					return {
+						outerNum: 20,
+					};
+				},
+			});
+
+			app.component("card", {
+				template: `<div class="card">
+          <div class="card-body">
+            原始 props: {{ num }} <br />
+            mounted 生命週期的預設值：<input type="number" v-model="innerNum" /> <br />
+            <!-- props 只能讀，不能直接改 num 的值，報錯訊息：Attempting to mutate prop "num". Props are readonly. -->
+            watch 同步的值：<input type="number" v-model="newNum" />
+            </div>
+          </div>`,
+				// 透過生命週期導入的值: {{ innterNum }} <br />
+				// 透過 watch 持續監聽的值：{{ watchNum }}
+				props: ["num"],
+				data() {
+					return {
+						innerNum: 0,
+						newNum: 0,
+						// watchNum: 0,
+					};
+				},
+				watch: {
+					// #1 當外層的 outerNum 更新時，內層可取得外層相對應的值
+					num() {
+						console.log("num 更新了");
+						this.newNum = this.num;
+					},
+				},
+				mounted() {
+					this.innerNum = this.num;
+					this.newNum = this.num; // watch 也需要給預測
+				},
+			});
+
+			app.mount("#app");
+		</script>
+	</body>
+</html>
