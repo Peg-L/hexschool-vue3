@@ -6,46 +6,28 @@
 VeeValidate.defineRule("email", VeeValidateRules["email"]);
 VeeValidate.defineRule("required", VeeValidateRules["required"]);
 
-// // ** 加入多國語系 **
-// // 讀取外部的資源
-// VeeValidateI18n.loadLocaleFromURL(
-// 	"https://unpkg.com/@vee-validate/i18n@4.0.2/dist/locale/ar.json"
-// );
-
-// // Activate the locale
-// VeeValidate.configure({
-// 	generateMessage: VeeValidateI18n.localize(
-// 		"https://unpkg.com/@vee-validate/i18n@4.1.0/dist/locale/zh_TW.json"
-// 	),
-// 	validateOnInput: true, // 調整為：輸入文字時，就立即進行驗證
-// });
-
-const { defineRule, Form, Field, ErrorMessage, configure } = VeeValidate;
-const { required, email, min, max } = VeeValidateRules;
-const { localize, loadLocaleFromURL } = VeeValidateI18n;
-
-defineRule("required", required);
-defineRule("email", email);
-defineRule("min", min);
-defineRule("max", max);
-
-loadLocaleFromURL(
+// ** 加入多國語系 **
+// 讀取外部的資源
+VeeValidateI18n.loadLocaleFromURL(
 	"https://unpkg.com/@vee-validate/i18n@4.1.0/dist/locale/zh_TW.json"
 );
 
-configure({
-	generateMessage: localize("zh_TW"),
+// Activate the locale
+VeeValidate.configure({
+	generateMessage: VeeValidateI18n.localize("zh_TW"),
+	validateOnInput: true, // 調整為：輸入文字時，就立即進行驗證
 });
 
 import productModal from "./productModal.js";
 
-const apiUrl = "https://vue3-course-api.hexschool.io";
+const apiUrl = "https://vue3-course-api.hexschool.io/v2";
 const apiPath = "drmeme";
 
 const app = Vue.createApp({
 	data() {
 		return {
 			products: [],
+			tempProduct: {},
 			productId: "",
 			cart: {},
 			loadingItem: "", // 存 id
@@ -60,82 +42,108 @@ const app = Vue.createApp({
 			},
 		};
 	},
-	components: {
-		VForm: Form,
-		VField: Field,
-		ErrorMessage: ErrorMessage,
-	},
 	methods: {
 		getProducts() {
-			axios.get(`${apiUrl}/v2/api/${apiPath}/products/all`).then((res) => {
-				console.log("產品列表：", res.data.products);
-				// 直接覆蓋原陣列，使用 =，加入 一筆資料 用 push
-				this.products = res.data.products;
-			});
+			axios
+				.get(`${apiUrl}/api/${apiPath}/products`)
+				.then((res) => {
+					// 要直接覆蓋原陣列，使用 =，而加入 一筆資料 用 push
+					this.products = res.data.products;
+				})
+				.catch((err) => {
+					alert(err.response.data.message);
+				});
 		},
 		openModal(id) {
 			this.productId = id;
-			console.log("外層帶入 productId:", id);
 		},
 		addToCart(product_id, qty = 1) {
+			this.loadingItem = product_id;
 			const data = {
 				product_id,
 				qty,
 			};
-			axios.post(`${apiUrl}/v2/api/${apiPath}/cart`, { data }).then((res) => {
-				console.log("加入購物車：", res.data);
-				// 加入購物車後自動關閉
-				// productModal 中加入 hide 方法
-				this.$refs.productModal.hide();
+			this.$refs.productModal.hide();
+			axios
+				.post(`${apiUrl}/api/${apiPath}/cart`, { data })
+				.then((res) => {
+					alert(res.data.message);
 
-				// 加入購物車時也要觸發
-				this.getCarts();
-			});
+					this.loadingItem = "";
+					// 加入購物車後自動關閉
+					// productModal 中加入 hide 方法
+
+					// 加入購物車時也要觸發
+					this.getCarts();
+				})
+				.catch((err) => {
+					alert(err.response.data.message);
+				});
 		},
 		getCarts() {
-			axios.get(`${apiUrl}/v2/api/${apiPath}/cart`).then((res) => {
-				console.log("購物車：", res.data);
-				this.cart = res.data.data;
-			});
+			axios
+				.get(`${apiUrl}/api/${apiPath}/cart`)
+				.then((res) => {
+					this.cart = res.data.data;
+				})
+				.catch((err) => {
+					alert(err.response.data.message);
+				});
 		},
 		updateCartItem(item) {
-			// 購物車的 id, 產品的 id
-			const data = {
-				product_id: item.product.id,
-				qty: item.qty,
-			};
-
 			this.loadingItem = item.id;
 
+			// 購物車的 id, 產品的 id
+			const data = {
+				product_id: item.product_id,
+				qty: item.qty,
+			};
 			axios
-				.put(`${apiUrl}/v2/api/${apiPath}/cart/${item.id}`, { data })
+				.put(`${apiUrl}/api/${apiPath}/cart/${item.id}`, { data })
 				.then((res) => {
-					console.log("更新購物車：", res.data);
-					this.getCarts();
+					alert(res.data.message);
 					this.loadingItem = ""; // 清空
+					this.getCarts();
+				})
+				.catch((err) => {
+					alert(err.response.data.message);
+					this.loadingItem = "";
+				});
+		},
+		deleteAllCarts() {
+			axios
+				.delete(`${apiUrl}/api/${apiPath}/carts`)
+				.then((res) => {
+					alert(res.data.message);
+					this.getCarts();
+				})
+				.catch((err) => {
+					alert(err.response.data.message);
 				});
 		},
 		deleteCartItem(item) {
 			this.loadingItem = item.id;
 			axios
-				.delete(`${apiUrl}/v2/api/${apiPath}/cart/${item.id}`)
+				.delete(`${apiUrl}/api/${apiPath}/cart/${item.id}`)
 				.then((res) => {
-					console.log("刪除購物車：", res.data);
+					alert(res.data.message);
 					this.loadingItem = "";
 					this.getCarts();
+				})
+				.catch((err) => {
+					alert(err.response.data.message);
 				});
 		},
 		createOrder() {
 			axios
-				.post(`${apiUrl}/v2/api/${apiPath}/order`, { data: this.form })
+				.post(`${apiUrl}/api/${apiPath}/order`, { data: this.form })
 				.then((res) => {
 					alert(res.data.message);
 					this.$refs.form.resetForm();
 					this.getCarts();
-					this.form.user = "";
 				})
 				.catch((err) => {
-					alert(err.data.message);
+					alert(err.response.data.message);
 				});
 		},
 		isPhone(value) {

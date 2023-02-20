@@ -8,22 +8,32 @@ export default {
 			qty: 1,
 		};
 	},
-	template: "#ProductModal",
+	template: "#productModal",
 	watch: {
 		id() {
-			console.log("productModal:", this.id);
+			this.loadingItem = this.id;
+
+			const apiUrl = "https://vue3-course-api.hexschool.io/v2";
+			const apiPath = "drmeme";
+
 			if (this.id) {
 				axios
-					.get(`${apiUrl}/v2/api/${apiPath}/product/${this.id}`)
+					.get(`${apiUrl}/api/${apiPath}/product/${this.id}`)
 					.then((res) => {
-						console.log("單一產品：", res.data.product);
 						this.tempProduct = res.data.product;
+
 						this.modal.show();
+					})
+					.catch((err) => {
+						alert(err.response.data.message);
 					});
 			}
 		},
 	},
 	methods: {
+		show() {
+			this.modal.show();
+		},
 		hide() {
 			this.modal.hide();
 		},
@@ -33,8 +43,8 @@ export default {
 		this.modal = new bootstrap.Modal(this.$refs.modal);
 		// 監聽 dom，當 modal 關閉時，...要做什麼事情
 		this.$refs.modal.addEventListener("hidden.bs.modal", (event) => {
-			// console.log("modal 被關閉了");
-			this.openModal(""); // 從外層傳入 openModal 事件，來改 ID
+			// this.getProduct(this.id); // 從外層傳入 getProduct 事件，來改 ID
+			this.openModal("");
 		});
 	},
 };
